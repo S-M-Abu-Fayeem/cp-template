@@ -1,131 +1,266 @@
-#include <bits/stdc++.h>
-using namespace std;
-#define gc getchar_unlocked
-#define fo(i,n) for(i=0;i<n;i++)
-#define Fo(i,k,n) for(i=k;k<n?i<n:i>n;k<n?i+=1:i-=1)
-#define ll long long
-#define si(x)	scanf("%d",&x)
-#define sl(x)	scanf("%lld",&x)
-#define ss(s)	scanf("%s",s)
-#define pi(x)	printf("%d\n",x)
-#define pl(x)	printf("%lld\n",x)
-#define ps(s)	printf("%s\n",s)
-#define deb(x) cout << #x << "=" << x << endl
-#define deb2(x, y) cout << #x << "=" << x << "," << #y << "=" << y << endl
-#define pb push_back
-#define mp make_pair
-#define F first
-#define S second
-#define all(x) x.begin(), x.end()
-#define clr(x) memset(x, 0, sizeof(x))
-#define sortall(x) sort(all(x))
-#define tr(it, a) for(auto it = a.begin(); it != a.end(); it++)
-#define PI 3.1415926535897932384626
-typedef pair<int, int>	pii;
-typedef pair<ll, ll>	pl;
-typedef vector<int>		vi;
-typedef vector<ll>		vl;
-typedef vector<pii>		vpii;
-typedef vector<pl>		vpl;
-typedef vector<vi>		vvi;
-typedef vector<vl>		vvl;
-int mpow(int base, int exp); 
-void ipgraph(int m);
-void dfs(int u, int par);
-const int mod = 1000000007;
-const int N = 3e5, M = N;
-//=======================
-const int MAX = 1e6;
-vi g[N];
-int a[N];
-struct wavelet_tree{
-	#define vi vector<int>
-	#define pb push_back
-	int lo, hi;
-	wavelet_tree *l, *r;
-	vi b;
-	
-	//nos are in range [x,y]
-	//array indices are [from, to)
-	wavelet_tree(int *from, int *to, int x, int y){
-		lo = x, hi = y;
-		if(lo == hi or from >= to) return;
-		int mid = (lo+hi)/2;
-		auto f = [mid](int x){
-			return x <= mid;
-		};
-		b.reserve(to-from+1);
-		b.pb(0);
-		for(auto it = from; it != to; it++)
-			b.pb(b.back() + f(*it));
-		//see how lambda function is used here	
-		auto pivot = stable_partition(from, to, f);
-		l = new wavelet_tree(from, pivot, lo, mid);
-		r = new wavelet_tree(pivot, to, mid+1, hi);
-	}
-	
-	//kth smallest element in [l, r]
-	int kth(int l, int r, int k){
-		if(l > r) return 0;
-		if(lo == hi) return lo;
-		int inLeft = b[r] - b[l-1];
-		int lb = b[l-1]; //amt of nos in first (l-1) nos that go in left 
-		int rb = b[r]; //amt of nos in first (r) nos that go in left
-		if(k <= inLeft) return this->l->kth(lb+1, rb , k);
-		return this->r->kth(l-lb, r-rb, k-inLeft);
-	}
-	
-	//count of nos in [l, r] Less than or equal to k
-	int LTE(int l, int r, int k) {
-		if(l > r or k < lo) return 0;
-		if(hi <= k) return r - l + 1;
-		int lb = b[l-1], rb = b[r];
-		return this->l->LTE(lb+1, rb, k) + this->r->LTE(l-lb, r-rb, k);
-	}
-  
-	//count of nos in [l, r] equal to k
-	int count(int l, int r, int k) {
-		if(l > r or k < lo or k > hi) return 0;
-		if(lo == hi) return r - l + 1;
-		int lb = b[l-1], rb = b[r], mid = (lo+hi)/2;
-		if(k <= mid) return this->l->count(lb+1, rb, k);
-		return this->r->count(l-lb, r-rb, k);
-	}
-	~wavelet_tree(){
-		delete l;
-		delete r;
-	}
-};
-int main()
-{
-	ios_base::sync_with_stdio(false);
-	cin.tie(NULL);
-	srand(time(NULL));
-	int i,n,k,j,q,l,r;
-	cin >> n;
-	fo(i, n) cin >> a[i+1];
-	wavelet_tree T(a+1, a+n+1, 1, MAX);
-	cin >> q;
-	while(q--){
-		int x;
-		cin >> x;
-		cin >> l >> r >> k;
-		if(x == 0){
-			//kth smallest
-			cout << "Kth smallest: ";
-			cout << T.kth(l, r, k) << endl;
-		}
-		if(x == 1){
-			//less than or equal to K
-			cout << "LTE: ";
-			cout << T.LTE(l, r, k) << endl;
-		}
-		if(x == 2){
-			//count occurence of K in [l, r]
-			cout << "Occurence of K: ";
-			cout << T.count(l, r, k) << endl;
-		}
-	}
-	return 0;
-} 
+#include<bits/stdc++.h>
 
+using namespace std;
+
+#define p_vec(a) for(int i = 0 ; i < a.size(); i++) { cout <<a[i] << " ";}  cout << endl;
+
+#define rsort(a) sort(a.rbegin(),a.end());
+#define rep(tt,st,n) for(int tt = st ; tt < n; tt++)
+#define per(tt,st,n) for(int tt = st; tt >= n; tt--)
+#define lb(a,x) lower_bound(a.begin(),a.end(),x);
+#define ub(a,x) upper_bound(a.begin(),a.end(),x);
+#define all(a) a.begin(),a.end();
+#define max_ele(a) *max_element(a.begin(),a.end());
+#define min_ele(a) *min_element(a.begin(),a.end());
+//data structure
+#define vi vector<int> 
+#define vvi vector<vi>
+#define vll vector<ll>
+#define vvll vector<vll>
+#define pi pair<int,int>
+#define pll pair<ll,ll>
+#define vpi vector<pi>
+#define vvpi vector<vpi>
+#define ff first
+#define ss second
+#define pb(a) push_back(a);
+
+typedef long long ll;
+typedef unsigned long long ull;
+typedef long double lld;
+
+//debug
+#ifndef ONLINE_JUDGE
+#define debug(x) cerr << #x <<" "; _print(x); cerr << endl;
+#else
+#define debug(x)
+#endif
+
+void _print(ll t) {cerr << t;}
+void _print(int t) {cerr << t;}
+void _print(string t) {cerr << t;}
+void _print(char t) {cerr << t;}
+void _print(lld t) {cerr << t;}
+void _print(double t) {cerr << t;}
+void _print(ull t) {cerr << t;}
+
+template <class T, class V> void _print(pair <T, V> p);
+template <class T> void _print(vector <T> v);
+template <class T> void _print(set <T> v);
+template <class T, class V> void _print(map <T, V> v);
+template <class T> void _print(multiset <T> v);
+template <class T, class V> void _print(pair <T, V> p) {cerr << "{"; _print(p.ff); cerr << ","; _print(p.ss); cerr << "}";}
+template <class T> void _print(vector <T> v) {cerr << "[ "; for (T i : v) {_print(i); cerr << " ";} cerr << "]";}
+template <class T> void _print(set <T> v) {cerr << "[ "; for (T i : v) {_print(i); cerr << " ";} cerr << "]";}
+template <class T> void _print(multiset <T> v) {cerr << "[ "; for (T i : v) {_print(i); cerr << " ";} cerr << "]";}
+template <class T, class V> void _print(map <T, V> v) {cerr << "[ "; for (auto i : v) {_print(i); cerr << " ";} cerr << "]";}
+
+
+
+//bit_manupulation
+#define checkbit(x,n) (x&(1LL<<n))
+#define setbit(x,n) (x=(x|(1LL<<n)))
+#define resetbit(x,n) (x=(x&(~(1LL<<n))))
+#define pow2(i) (1LL<<i)
+
+#define fast() ios_base::sync_with_stdio(false); cin.tie(NULL);
+
+template<typename T> void read(T&a){for(auto&e:a)cin>>e;}
+template<typename T> void write(T a){for(auto e:a)cout<<e<<" ";cout<<endl;}
+
+// ------------------------------------------------------------//
+
+
+
+struct wavelet_tree {
+    int lo, hi;
+    wavelet_tree *l, *r;
+    vector<int> b; // b[i] = # elements among first i that go to left child
+
+    // from: pointer to first element (1-indexed pointer ok), to: pointer to one-past-last
+    wavelet_tree(int *from, int *to, int x, int y) {
+        lo = x; hi = y;
+        l = r = nullptr;
+        if (from >= to || lo > hi) return;
+        if (lo == hi) {
+            // leaf node: fill b so queries use 1-indexed positions
+            b.reserve(to - from + 1);
+            b.push_back(0);
+            for (auto it = from; it != to; ++it) b.push_back(b.back() + 1); // all go to this leaf
+            return;
+        }
+        int mid = lo + (hi - lo) / 2;
+        auto f = [mid](int v){ return v <= mid; };
+        b.reserve(to - from + 1);
+        b.push_back(0);
+        for (auto it = from; it != to; ++it) b.push_back(b.back() + (f(*it) ? 1 : 0));
+        // partition so that left part contains <= mid, right part > mid
+        auto pivot = stable_partition(from, to, f);
+        if (from != pivot) l = new wavelet_tree(from, pivot, lo, mid);
+        if (pivot != to)   r = new wavelet_tree(pivot, to, mid + 1, hi);
+    }
+
+    // count of numbers equal to k in range [lpos, rpos] (1-indexed positions)
+    int count(int lpos, int rpos, int k) {
+        if (lpos > rpos || k < lo || k > hi) return 0;
+        if (lo == hi) return rpos - lpos + 1;
+        int lb = b[lpos - 1], rb = b[rpos];
+        int mid = (lo + hi) / 2;
+        if (k <= mid) {
+            if (!this->l) return 0;
+            return this->l->count(lb + 1, rb, k);
+        } else {
+            if (!this->r) return 0;
+            return this->r->count(lpos - lb, rpos - rb, k);
+        }
+    }
+
+    ~wavelet_tree() {
+        delete l;
+        delete r;
+    }
+};
+
+int main() {
+#ifndef ONLINE_JUDGE
+    freopen("error.txt","w",stderr);
+#endif
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+
+    int T; 
+    if (!(cin >> T)) return 0;
+    int tot = 0;
+    while (T--) {
+        int n;
+        cin >> n;
+        if (n <= 0) {
+            cout << "\n";
+            continue;
+        }
+        if(tot + n >= 60) {
+        	//cout << "yo" << endl;
+        }
+        tot+=n;
+        vector<int> orig(n + 1);
+        for (int i = 1; i <= n; ++i) cin >> orig[i];
+
+        if (n == 1) {
+            cout << -1 << "\n";
+            continue;
+        }
+
+       
+        vector<int> vals;
+        vals.reserve(n);
+        for (int i = 1; i <= n; ++i) vals.push_back(orig[i]);
+        sort(vals.begin(), vals.end());
+        vals.erase(unique(vals.begin(), vals.end()), vals.end());
+        
+        unordered_map<int,int> comp;
+        comp.reserve(vals.size()*2);
+        for (int i = 0; i < (int)vals.size(); ++i) comp[vals[i]] = i + 1;
+        int m = (int)vals.size();
+        
+        vector<int> carr(n + 1);
+        for (int i = 1; i <= n; ++i) carr[i] = comp[orig[i]];
+
+       
+        vector<int> arr_for_tree(n + 1);
+        for (int i = 1; i <= n; ++i) arr_for_tree[i] = carr[i];
+        
+        wavelet_tree Ttree(arr_for_tree.data() + 1, arr_for_tree.data() + n + 1, 1, m);
+
+       
+        vector<ll> pre(n + 2, 0), suff(n + 3, 0);
+        for (int i = 1; i <= n; ++i) pre[i] = pre[i-1] + (ll)orig[i];
+        for (int i = n; i >= 1; --i) suff[i] = suff[i+1] + (ll)orig[i];
+
+        
+        vector<int> aa(n + 2);
+        for (int i = 1; i <= n; ++i) aa[i] = orig[i];
+
+       
+        for (int i = 1; i <= n; ++i) {
+        	if( (i +  1 <= n && comp[aa[i]] < comp[aa[i + 1]]) || ((i -1 ) > 0 && comp[aa[i]] < comp[aa[i-1]])){
+        		cout << 1 << " ";
+        		continue;
+        	}
+            if (i == 1) {
+                int lll = 2, rr = n;
+                int ans = INT_MAX;
+                while (lll <= rr) {
+                    int mid = (lll + rr) / 2;
+                    ll su = pre[mid] - pre[i];
+                    
+                    int compressed_query = comp[ aa[i + 1] ];
+                    int cnt = Ttree.count(i + 1, mid, compressed_query);
+                    if (su > aa[i] && (cnt != (mid - i) || (mid - i) == 1)) {
+                        rr = mid - 1;
+                        ans = mid - i;
+                    } else {
+                        lll = mid + 1;
+                    }
+                }
+                if (ans == INT_MAX) cout << -1 << " ";
+                else cout << ans << " ";
+            }
+            else if (i == n) {
+                int lll = 1, rr = i - 1;
+                int ans = INT_MAX;
+                while (lll <= rr) {
+                    int mid = (lll + rr) / 2;
+                    ll su = pre[i - 1] - pre[mid - 1];
+                    int compressed_query = comp[ aa[i - 1] ];
+                    int cnt = Ttree.count(mid, i - 1, compressed_query);
+                    if (su > aa[i] && (cnt != (i - mid) || (i - mid) == 1)) {
+                        lll = mid + 1;
+                        ans = i - mid;
+                    } else {
+                        rr = mid - 1;
+                    }
+                }
+                if (ans == INT_MAX) cout << -1 << " ";
+                else cout << ans << " ";
+            }
+            else {
+                
+                int lll = i + 1, rr = n;
+                int ans1 = INT_MAX;
+                while (lll <= rr) {
+                    int mid = (lll + rr) / 2;
+                    ll su = pre[mid] - pre[i];
+                    int compressed_query = comp[ aa[i + 1] ];
+                    int cnt = Ttree.count(i + 1, mid, compressed_query);
+                    if (su > aa[i] && (cnt != (mid - i) || (mid - i) == 1)) {
+                        rr = mid - 1;
+                        ans1 = mid - i;
+                    } else {
+                        lll = mid + 1;
+                    }
+                }
+
+                lll = 1; rr = i - 1;
+                int ans2 = INT_MAX;
+                while (lll <= rr) {
+                    int mid = (lll + rr) / 2;
+                    ll su = pre[i - 1] - pre[mid - 1];
+                    int compressed_query = comp[ aa[i - 1] ];
+                    int cnt = Ttree.count(mid, i - 1, compressed_query);
+                    if (su > aa[i] && (cnt != (i - mid) || (i - mid) == 1)) {
+                        lll = mid + 1;
+                        ans2 = i - mid;
+                    } else {
+                        rr = mid - 1;
+                    }
+                }
+
+                int res = min(ans1, ans2);
+                if (res == INT_MAX) cout << -1 << " ";
+                else cout << res << " ";
+            }
+        }
+        cout << "\n";
+    }
+    return 0;
+}
